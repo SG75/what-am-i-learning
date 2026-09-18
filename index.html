@@ -4,18 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Track what you're currently learning — courses, resources and progress, all in one place."
-    />
+    <meta name="description" content="Track what you're currently learning — courses, resources and progress, all in one place." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Apply saved theme before first paint to avoid a flash of wrong theme
+      try {
+        if (localStorage.getItem("theme") === "light") {
+          document.documentElement.classList.add("light");
+        }
+      } catch (e) {
+        /* localStorage unavailable — default to dark */
+      }
+    </script>
     <title>What Am I Learning</title>
-    <base target="_blank" />
   </head>
   <body>
     <div id="root"></div>

@@ -3,21 +3,21 @@ import LearningCard from "./LearningCard";
 export default function LearningList({
   items,
   onDelete,
-  onCycleStatus,
   onUpdate,
+  onCycleStatus,
   activeFilter,
 }) {
   if (items.length === 0) {
     const isFiltered = activeFilter && activeFilter !== "all";
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-24 text-center">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 text-4xl">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface/15 bg-surface/[0.02] px-6 py-24 text-center">
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface/5 text-4xl">
           🌱
         </div>
-        <p className="text-lg font-semibold text-white/75">
+        <p className="text-lg font-semibold text-surface/75">
           {isFiltered ? "Nothing matches this filter" : "Nothing here yet"}
         </p>
-        <p className="mt-1.5 text-base text-white/40">
+        <p className="mt-1.5 text-base text-surface/45">
           {isFiltered
             ? "Try a different status filter above."
             : "Add your first learning item using the form above."}
@@ -33,8 +33,8 @@ export default function LearningList({
           key={item.id}
           item={item}
           onDelete={onDelete}
-          onCycleStatus={onCycleStatus}
           onUpdate={onUpdate}
+          onCycleStatus={onCycleStatus}
           index={index}
         />
       ))}
