@@ -33,6 +33,8 @@ function App() {
     title: "",
     category: "",
     status: "learning",
+    notes: "",
+    resourcesInput: "",
   });
 
   const handleChange = (e) => {
@@ -47,6 +49,11 @@ function App() {
     const nextId =
       items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
 
+    const resources = newItem.resourcesInput
+      .split(/[\n,]/)
+      .map((url) => url.trim())
+      .filter(Boolean);
+
     const itemToAdd = {
       id: nextId,
       title: newItem.title.trim(),
@@ -57,12 +64,24 @@ function App() {
         month: "short",
         year: "numeric",
       }),
-      notes: "",
-      resources: [],
+      notes: newItem.notes.trim(),
+      resources,
     };
 
     setItems([...items, itemToAdd]);
-    setNewItem({ title: "", category: "", status: "learning" });
+    setNewItem({
+      title: "",
+      category: "",
+      status: "learning",
+      notes: "",
+      resourcesInput: "",
+    });
+  };
+
+  const handleUpdateItem = (id, updates) => {
+    setItems(
+      items.map((item) => (item.id === id ? { ...item, ...updates } : item)),
+    );
   };
 
   const handleDelete = (id) => {
@@ -282,6 +301,40 @@ function App() {
               </svg>
               Add
             </button>
+            <div className="sm:col-span-4">
+              <label
+                htmlFor="notes"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-white/40"
+              >
+                Notes (optional)
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={newItem.notes}
+                onChange={handleChange}
+                placeholder="Any progress notes..."
+                rows={2}
+                className={`${inputCls} resize-none`}
+              />
+            </div>
+            <div className="sm:col-span-4">
+              <label
+                htmlFor="resourcesInput"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-white/40"
+              >
+                Resources (optional — one URL per line)
+              </label>
+              <textarea
+                id="resourcesInput"
+                name="resourcesInput"
+                value={newItem.resourcesInput}
+                onChange={handleChange}
+                placeholder="https://example.com/course"
+                rows={2}
+                className={`${inputCls} resize-none`}
+              />
+            </div>
           </form>
         </section>
 
@@ -319,6 +372,7 @@ function App() {
           items={filteredItems}
           onDelete={handleDelete}
           onCycleStatus={handleCycleStatus}
+          onUpdate={handleUpdateItem}
           activeFilter={activeFilter}
         />
 

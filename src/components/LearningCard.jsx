@@ -1,3 +1,4 @@
+import { useState } from "react";
 const statusConfig = {
   learning: {
     bar: "from-emerald-400 via-teal-400 to-cyan-400",
@@ -31,9 +32,13 @@ export default function LearningCard({
   item,
   onDelete,
   onCycleStatus,
+  onUpdate,
   index = 0,
 }) {
   const status = statusConfig[item.status] || fallback;
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftNotes, setDraftNotes] = useState(item.notes || "");
+  const [draftResource, setDraftResource] = useState("");
 
   const resources = (item.resources || []).map((resource) => {
     let label = resource;
@@ -44,6 +49,23 @@ export default function LearningCard({
     }
     return { url: resource, label };
   });
+
+  const handleSaveNotes = () => {
+    if (draftNotes !== item.notes) onUpdate(item.id, { notes: draftNotes });
+  };
+
+  const handleAddResource = () => {
+    const url = draftResource.trim();
+    if (!url) return;
+    onUpdate(item.id, { resources: [...(item.resources || []), url] });
+    setDraftResource("");
+  };
+
+  const handleRemoveResource = (urlToRemove) => {
+    onUpdate(item.id, {
+      resources: (item.resources || []).filter((r) => r !== urlToRemove),
+    });
+  };
 
   return (
     <li
@@ -123,30 +145,84 @@ export default function LearningCard({
         {resources.length > 0 && (
           <div className="mt-5 flex flex-col gap-2 border-t border-white/10 pt-4">
             {resources.map((resource, i) => (
-              <a
-                key={i}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3.5 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/15 hover:text-white"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4 shrink-0 text-indigo-300"
+              <div key={i} className="flex items-center gap-2">
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex flex-1 items-center gap-2 rounded-lg bg-white/10 px-3.5 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/15 hover:text-white"
                 >
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" x2="21" y1="14" y2="3" />
-                </svg>
-                <span className="truncate">{resource.label}</span>
-              </a>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4 shrink-0 text-indigo-300"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" x2="21" y1="14" y2="3" />
+                  </svg>
+                  <span className="truncate">{resource.label}</span>
+                </a>
+                {isEditing && (
+                  <button
+                    onClick={() => handleRemoveResource(resource.url)}
+                    className="rounded-lg p-2 text-white/30 hover:bg-red-400/10 hover:text-red-400"
+                    title="Remove resource"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             ))}
+          </div>
+        )}
+
+        {/* Notes display */}
+        {item.notes && !isEditing && (
+          <p className="mt-4 whitespace-pre-wrap border-t border-white/10 pt-3 text-sm text-white/60">
+            {item.notes}
+          </p>
+        )}
+
+        {/* Edit toggle */}
+        <button
+          onClick={() => setIsEditing((v) => !v)}
+          className="mt-3 self-start text-xs font-medium text-white/40 transition hover:text-white/70"
+        >
+          {isEditing ? "Close" : "+ Add notes / resource"}
+        </button>
+
+        {/* Edit panel */}
+        {isEditing && (
+          <div className="mt-3 flex flex-col gap-2 rounded-xl border border-white/10 bg-white/5 p-3">
+            <textarea
+              value={draftNotes}
+              onChange={(e) => setDraftNotes(e.target.value)}
+              onBlur={handleSaveNotes}
+              placeholder="Add notes..."
+              rows={3}
+              className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-indigo-400/60"
+            />
+            <div className="flex gap-2">
+              <input
+                value={draftResource}
+                onChange={(e) => setDraftResource(e.target.value)}
+                placeholder="https://... add a resource link"
+                className="flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-indigo-400/60"
+              />
+              <button
+                type="button"
+                onClick={handleAddResource}
+                className="rounded-lg bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
+              >
+                Add
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ export default function LearningList({
   items,
   onDelete,
   onCycleStatus,
+  onUpdate,
   activeFilter,
 }) {
   if (items.length === 0) {
@@ -33,6 +34,7 @@ export default function LearningList({
           item={item}
           onDelete={onDelete}
           onCycleStatus={onCycleStatus}
+          onUpdate={onUpdate}
           index={index}
         />
       ))}
