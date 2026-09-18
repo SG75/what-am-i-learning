@@ -13,12 +13,59 @@ const filterGradients = {
 };
 
 const inputCls =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/30 outline-none transition focus:border-indigo-400/60 focus:ring-2 focus:ring-indigo-500/20";
+  "w-full rounded-xl border border-surface/10 bg-surface/5 px-4 py-3 text-base text-surface placeholder:text-surface/40 outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/20";
 
 const iconBtnCls =
-  "inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-base font-medium text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white";
+  "inline-flex items-center gap-2 rounded-xl border border-surface/10 bg-surface/5 px-5 py-3 text-base font-medium text-surface/70 transition hover:border-surface/25 hover:bg-surface/10 hover:text-surface";
+
+const SunIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2" />
+    <path d="M12 20v2" />
+    <path d="m4.93 4.93 1.41 1.41" />
+    <path d="m17.66 17.66 1.41 1.41" />
+    <path d="M2 12h2" />
+    <path d="M20 12h2" />
+    <path d="m6.34 17.66-1.41 1.41" />
+    <path d="m19.07 4.93-1.41 1.41" />
+  </svg>
+);
+
+const MoonIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </svg>
+);
 
 function App() {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "dark",
+  );
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("light", theme === "light");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   const [activeFilter, setActiveFilter] = useState("all");
   const [items, setItems] = useState(() => {
     const saved = localStorage.getItem("learningItems");
@@ -33,6 +80,8 @@ function App() {
     title: "",
     category: "",
     status: "learning",
+    notes: "",
+    resources: "",
   });
 
   const handleChange = (e) => {
@@ -57,12 +106,21 @@ function App() {
         month: "short",
         year: "numeric",
       }),
-      notes: "",
-      resources: [],
+      notes: newItem.notes.trim(),
+      resources: newItem.resources
+        .split(/[,,\n]/)
+        .map((r) => r.trim())
+        .filter(Boolean),
     };
 
     setItems([...items, itemToAdd]);
-    setNewItem({ title: "", category: "", status: "learning" });
+    setNewItem({
+      title: "",
+      category: "",
+      status: "learning",
+      notes: "",
+      resources: "",
+    });
   };
 
   const handleDelete = (id) => {
@@ -81,6 +139,14 @@ function App() {
                 ],
             }
           : item,
+      ),
+    );
+  };
+
+  const handleUpdate = (id, updatedFields) => {
+    setItems(
+      items.map((item) =>
+        item.id === id ? { ...item, ...updatedFields } : item,
       ),
     );
   };
@@ -153,16 +219,16 @@ function App() {
               </svg>
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 What am I <span className="gradient-text">learning</span>?
               </h1>
-              <p className="mt-1.5 text-base text-white/45">
+              <p className="mt-1.5 text-base text-surface/50">
                 Track courses, resources and progress — all in one place.
               </p>
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button onClick={handleExport} className={iconBtnCls}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -203,11 +269,24 @@ function App() {
                 className="hidden"
               />
             </label>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              title={
+                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+              }
+              className="inline-flex h-[50px] w-[50px] items-center justify-center rounded-xl border border-surface/10 bg-surface/5 text-surface/70 transition hover:border-surface/25 hover:bg-surface/10 hover:text-surface"
+            >
+              {theme === "dark" ? (
+                <SunIcon className="h-5 w-5" />
+              ) : (
+                <MoonIcon className="h-5 w-5" />
+              )}
+            </button>
           </div>
         </header>
 
         {/* Add-item form */}
-        <section className="mb-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur">
+        <section className="mb-8 rounded-2xl border border-surface/10 bg-surface/[0.03] p-6 backdrop-blur">
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[1.4fr_1fr_0.9fr_auto]"
@@ -215,7 +294,7 @@ function App() {
             <div>
               <label
                 htmlFor="title"
-                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-white/40"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-surface/50"
               >
                 Title
               </label>
@@ -231,7 +310,7 @@ function App() {
             <div>
               <label
                 htmlFor="category"
-                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-white/40"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-surface/50"
               >
                 Category
               </label>
@@ -247,7 +326,7 @@ function App() {
             <div>
               <label
                 htmlFor="status"
-                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-white/40"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-surface/50"
               >
                 Status
               </label>
@@ -282,6 +361,45 @@ function App() {
               </svg>
               Add
             </button>
+
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="notes"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-surface/50"
+              >
+                Notes{" "}
+                <span className="font-normal normal-case tracking-normal text-surface/35">
+                  (optional)
+                </span>
+              </label>
+              <input
+                id="notes"
+                name="notes"
+                value={newItem.notes}
+                onChange={handleChange}
+                placeholder="e.g. Focus on part 2, GraphQL chapter is skippable for now"
+                className={inputCls}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="resources"
+                className="mb-2 block text-sm font-semibold uppercase tracking-wider text-surface/50"
+              >
+                Resources{" "}
+                <span className="font-normal normal-case tracking-normal text-surface/35">
+                  (comma-separated URLs)
+                </span>
+              </label>
+              <input
+                id="resources"
+                name="resources"
+                value={newItem.resources}
+                onChange={handleChange}
+                placeholder="https://fullstackopen.com, https://courses.mooc.fi"
+                className={inputCls}
+              />
+            </div>
           </form>
         </section>
 
@@ -296,7 +414,7 @@ function App() {
                 className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-base font-medium transition-all ${
                   isActive
                     ? `bg-gradient-to-r ${filterGradients[filter]} text-white shadow-lg`
-                    : "border border-white/10 bg-white/5 text-white/55 hover:border-white/25 hover:text-white"
+                    : "border border-surface/10 bg-surface/5 text-surface/60 hover:border-surface/25 hover:text-surface"
                 }`}
               >
                 {filter}
@@ -304,7 +422,7 @@ function App() {
                   className={`rounded-full px-2 text-sm font-semibold ${
                     isActive
                       ? "bg-white/25 text-white"
-                      : "bg-white/10 text-white/45"
+                      : "bg-surface/10 text-surface/50"
                   }`}
                 >
                   {countFor(filter)}
@@ -318,11 +436,12 @@ function App() {
         <LearningList
           items={filteredItems}
           onDelete={handleDelete}
+          onUpdate={handleUpdate}
           onCycleStatus={handleCycleStatus}
           activeFilter={activeFilter}
         />
 
-        <footer className="mt-12 border-t border-white/5 pt-6 text-center text-sm text-white/30">
+        <footer className="mt-12 border-t border-surface/10 pt-6 text-center text-sm text-surface/40">
           Your list is saved locally in this browser.
         </footer>
       </div>

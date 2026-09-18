@@ -1,19 +1,45 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans:
     "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     sans-serif;
+
+  /* Semantic colors — values swap between :root (dark) and .light */
+  --color-surface: rgb(var(--surface));
+  --color-accent: rgb(var(--accent));
+  --color-learning: rgb(var(--learning));
+  --color-queued: rgb(var(--queued));
+  --color-finished: rgb(var(--finished));
 }
 
-html {
+:root {
   color-scheme: dark;
+
+  --surface: 255 255 255; /* overlays, borders, text on dark */
+  --accent: 129 140 248; /* indigo-400 */
+  --learning: 52 211 153; /* emerald-400 */
+  --queued: 251 191 36; /* amber-400 */
+  --finished: 56 189 248; /* sky-400 */
+  --page: #09090b;
+}
+
+.light {
+  color-scheme: light;
+
+  --surface: 24 24 27; /* near-black overlays on light background */
+  --accent: 79 70 229; /* indigo-600 */
+  --learning: 5 150 105; /* emerald-600 */
+  --queued: 217 119 6; /* amber-600 */
+  --finished: 2 132 199; /* sky-600 */
+  --page: #f4f5f7;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #09090b;
-  color: #fafafa;
+  background-color: var(--page);
+  color: rgb(var(--surface));
   min-height: 100vh;
   background-image:
     radial-gradient(
@@ -32,6 +58,28 @@ body {
       transparent
     );
   background-attachment: fixed;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.light body {
+  background-image:
+    radial-gradient(
+      ellipse 60% 40% at 50% -10%,
+      rgba(99, 102, 241, 0.12),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 40% 30% at 90% 10%,
+      rgba(192, 132, 252, 0.08),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 40% 30% at 10% 95%,
+      rgba(56, 189, 248, 0.06),
+      transparent
+    );
 }
 
 ::selection {
@@ -42,7 +90,7 @@ body {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--page);
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
@@ -50,6 +98,12 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.22);
+}
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
 }
 
 .gradient-text {
@@ -77,4 +131,8 @@ body {
 select option {
   background-color: #18181b;
   color: #fafafa;
+}
+.light select option {
+  background-color: #ffffff;
+  color: #18181b;
 }
